@@ -17,7 +17,7 @@ const properties: Property[] = [
   {
     id: 1,
     title: 'Tulip Ocean View',
-    image: '/images/Side.jpg',
+    image: '/images/side.jpg',
     location: 'Majengo',
     price: '$350,000',
     bedrooms: 4,
@@ -26,7 +26,7 @@ const properties: Property[] = [
   {
     id: 2,
     title: 'Java Group Regency',
-    image: '/images/room1.jpg',
+    image: '/images/Room1.jpg',
     location: 'Mumujyi',
     price: '$1,250,000',
     bedrooms: 4,
@@ -35,7 +35,7 @@ const properties: Property[] = [
   {
     id: 3,
     title: 'Royal sky Resident',
-    image: '/images/Side1.jpg',
+    image: '/images/side1.jpg',
     location: 'Mbugangali',
     price: '$950,000',
     bedrooms: 4,
@@ -44,7 +44,7 @@ const properties: Property[] = [
   {
   id: 4,
     title: 'Tulip Ocean View',
-    image: '/images/room2.jpg',
+    image: '/images/Room2.jpg',
     location: 'Majengo',
     price: '$350,000',
     bedrooms: 4,
@@ -53,7 +53,7 @@ const properties: Property[] = [
   {
     id: 11,
     title: 'Tulip Ocean View',
-    image: '/images/Side.jpg',
+    image: '/images/side.jpg',
     location: 'Majengo',
     price: '$350,000',
     bedrooms: 4,
@@ -62,7 +62,7 @@ const properties: Property[] = [
   {
     id: 12,
     title: 'Java Group Regency',
-    image: '/images/room1.jpg',
+    image: '/images/Room1.jpg',
     location: 'Mumujyi',
     price: '$1,250,000',
     bedrooms: 4,
@@ -71,7 +71,7 @@ const properties: Property[] = [
   {
     id: 13,
     title: 'Royal sky Resident',
-    image: '/images/Side1.jpg',
+    image: '/images/side1.jpg',
     location: 'Mbugangali',
     price: '$950,000',
     bedrooms: 4,
@@ -80,7 +80,7 @@ const properties: Property[] = [
   {
   id: 14,
     title: 'Tulip Ocean View',
-    image: '/images/room2.jpg',
+    image: '/images/Room2.jpg',
     location: 'Majengo',
     price: '$350,000',
     bedrooms: 4,
