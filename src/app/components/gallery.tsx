@@ -34,12 +34,13 @@ export default function Gallery() {
           className="overflow-hidden"
         >
           {images.map((src, i) => (
-            <SwiperSlide key={i}>
+            <SwiperSlide key={i} className="p-1">
               <div className="relative h-[550px] overflow-hidden shadow-lg">
                 <Image
                   src={src}
                   alt={`Gallery Image ${i + 1}`}
                   fill
+                  objectFit="cover"
                   className="object-cover transform hover:scale-105 transition duration-500"
                 />
               </div>
