@@ -12,12 +12,12 @@ const slides: HeroSlide[] = [
     description: 'Muraho! Welcome to Gisenyi Home Pass, your trusted local friend for finding the perfect home away from home. Whether you\'re here for business or adventure, we\'ll connect you with warm, authentic accommodations that make you feel like family from day one.',
   },
   {
-    photo: '/images/Closet.jpg',
+    photo: '/images/closet.jpg',
     title: 'Your cozy corner',
     description: 'Karibu!! Looking for a cozy private room with a local touch? At Gisenyi Home Pass, we connect you with warm, authentic accommodations where you\'ll have your own space while experiencing genuine community hospitality in beautiful Gisenyi.',
   },
   {
-    photo: '/images/Villa.jpg',
+    photo: '/images/villa.jpg',
     title: 'Private Paradise',
     description: 'At Gisenyi Home Pass, we specialize in connecting travelers with entire homes that offer complete privacy, authentic local character, and all the comforts you need for an unforgettable stay.',
   },
