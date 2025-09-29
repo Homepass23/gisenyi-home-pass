@@ -9,7 +9,7 @@ const SearchBar = () => {
       <form className="bg-white rounded-md shadow-lg p-3 grid grid-cols-1 sm:grid-cols-5 gap-2">
         <SearchField
           icon={<FaMapMarkerAlt />}
-          placeholder="Where do you want to go ?"
+          placeholder="Accommodation type"
         />
         <SearchField
           icon={<FaCalendarAlt />}

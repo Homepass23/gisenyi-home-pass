@@ -6,40 +6,25 @@ import {
   Wifi,
   Coffee,
   Star,
-  ChevronDown,
   Settings,
   Users,
   Box,
 } from "lucide-react";
 
-type Room = {
-  id: string;
-  title: string;
-  pricePerNight: number;
-  currency?: string;
-  excerpt: string;
-  image: string;
-  featured?: boolean;
-  amenities?: string[];
-  rating?: number;
-  type?: "Deluxe" | "Single" | "Family" | "Economy"|"Standard" | "Twin" | "Suite";
-  instant?: boolean;
-  freeCancel?: boolean;
-};
+import { Accomodation } from "../types/accommodation";
 
-const SAMPLE_ROOMS: Room[] = [
+
+const SAMPLE_ROOMS: Accomodation[] = [
   {
     id: "r1",
     title: "Deluxe Room",
     pricePerNight: 199,
-    currency: "Rwf",
-    excerpt:
+    description:
       "Spacious room with city view, comfortable king bed and modern amenities.",
-    image: "/images/Room1.jpg",
-    featured: true,
+    Images: ["/images/Room1.jpg"],
     amenities: ["wifi", "coffee", "tv", "cutlery", "parking", "ac"],
     rating: 4.6,
-    type: "Deluxe",
+    type: "Room",
     instant: true,
     freeCancel: true,
   },
@@ -47,25 +32,23 @@ const SAMPLE_ROOMS: Room[] = [
     id: "r2",
     title: "Single Room",
     pricePerNight: 210,
-    currency: "Rwf",
-    excerpt: "Cozy single room ideal for solo travelers.",
-    image: "/images/Room2.jpg",
+    description: "Cozy single room ideal for solo travelers.",
+    Images: ["/images/Room2.jpg"],
     amenities: ["wifi", "shower", "cutlery", "breakfast"],
     rating: 4.2,
-    type: "Single",
+    type: "Room",
     instant: false,
     freeCancel: true,
   },
   {
     id: "r3",
-    title: "Family Suite",
+    title: "Family Entire house",
     pricePerNight: 289,
-    currency: "Rwf",
-    excerpt: "Large suite with sleeping area and living space for families.",
-    image: "/images/Room.jpg",
+    description: "Large Entire house with sleeping area and living space for families.",
+    Images: ["/images/Room.jpg"],
     amenities: ["wifi", "tv", "coffee", "cutlery", "ac", "breakfast"],
     rating: 4.8,
-    type: "Family",
+    type: "Room",
     instant: true,
     freeCancel: false,
   },
@@ -73,26 +56,25 @@ const SAMPLE_ROOMS: Room[] = [
     id: "r4",
     title: "Economy Room",
     pricePerNight: 129,
-    currency: "Rwf",
-    excerpt: "Smart, budget-friendly room with essential comforts.",
-    image: "/images/bedroom.jpg",
+    description: "Smart, budget-friendly room with essential comforts.",
+    Images: ["/images/bedroom.jpg"],
+    maxGuests: 2,
     amenities: ["wifi"],
     rating: 3.9,
-    type: "Economy",
+    type: "Room",
     instant: false,
     freeCancel: false,
   },
   {
     id: "r5",
-    title: "Executive Suite",
+    title: "Executive Entire house",
     pricePerNight: 350,
-    currency: "Rwf",
-    excerpt:
-      "Luxurious suite with private lounge and premium services for executives.",
-    image: "/images/condo.jpg",
+    description:
+      "Luxurious Entire house with private lounge and premium services for executives.",
+    Images: ["/images/condo.jpg"],
     amenities: ["wifi", "tv", "coffee", "cutlery", "ac", "parking", "spa"],
     rating: 4.9,
-    type: "Suite",
+    type: "Entire house",
     instant: true,
     freeCancel: true,
   },
@@ -100,36 +82,33 @@ const SAMPLE_ROOMS: Room[] = [
     id: "r6",
     title: "Twin Room",
     pricePerNight: 180,
-    currency: "Rwf",
-    excerpt: "Comfortable twin beds, perfect for friends or colleagues.",
-    image: "/images/cozy.jpg",
+    description: "Comfortable twin beds, perfect for friends or colleagues.",
+    Images: ["/images/cozy.jpg"],
     amenities: ["wifi", "tv", "shower", "breakfast"],
     rating: 4.3,
-    type: "Twin",
+    type: "Room",
     instant: true,
     freeCancel: true,
   },
   {
     id: "r7",
-    title: "Honeymoon Suite",
+    title: "Honeymoon Entire house",
     pricePerNight: 399,
-    currency: "Rwf",
-    excerpt: "Romantic suite with elegant décor and jacuzzi.",
-    image: "/images/interior.jpg",
+    description: "Romantic Entire house with elegant décor and jacuzzi.",
+    Images: ["/images/interior.jpg"],
     amenities: ["wifi", "tv", "spa", "jacuzzi", "breakfast"],
     rating: 4.9,
-    type: "Suite",
+    type: "Entire house",
     instant: true,
     freeCancel: false,
   },
   
   {
     id: "r9",
-    title: "Presidential Suite",
+    title: "Presidential Entire house",
     pricePerNight: 599,
-    currency: "Rwf",
-    excerpt: "Ultimate luxury experience with private dining and butler service.",
-    image: "/images/inzu.jpg",
+    description: "Ultimate luxury experience with private dining and butler service.",
+    Images: ["/images/inzu.jpg"],
     amenities: [
       "wifi",
       "tv",
@@ -141,7 +120,7 @@ const SAMPLE_ROOMS: Room[] = [
       "butler",
     ],
     rating: 5.0,
-    type: "Suite",
+    type: "Entire house",
     instant: true,
     freeCancel: false,
   },
@@ -150,7 +129,6 @@ const SAMPLE_ROOMS: Room[] = [
 
 export default function AccommodationsListing() {
   const [queryRooms] = useState(SAMPLE_ROOMS);
-  const [openDetails, setOpenDetails] = useState<string | null>(null);
 
   // Sidebar UI state (UI-only for now; hook up to filtering later if needed)
   const [minPrice, setMinPrice] = useState<string>("");
@@ -165,7 +143,7 @@ export default function AccommodationsListing() {
     parking: false,
   });
   const [roomType, setRoomType] = useState<
-    Array<"Deluxe" | "Single" | "Family" | "Economy">
+    Array<'Entire house' | 'Room'>
   >([]);
   const [rating, setRating] = useState<number | null>(null);
   const [instant, setInstant] = useState<boolean>(false);
@@ -323,7 +301,7 @@ export default function AccommodationsListing() {
 
             {/* Room Type (added) */}
             <SidebarSection title="Room Type">
-              {(["Deluxe", "Single", "Family", "Economy"] as const).map(
+              {(['Entire house', 'Room'] as const).map(
                 (t) => (
                   <label
                     key={t}
@@ -423,23 +401,16 @@ export default function AccommodationsListing() {
                 className="bg-white border rounded-lg shadow-sm overflow-hidden"
               >
                 <div className="grid grid-cols-12">
-                  {/* Image */}
+                  {/* gallery */}
                   <div className="col-span-12 md:col-span-5 relative">
                     <div className="relative h-48 md:h-40 lg:h-44">
                       <Image
-                        src={room.image}
+                        src={room.Images[0]}
                         alt={room.title}
                         fill
                         className="object-cover"
                       />
                     </div>
-
-                    {room.featured && (
-                      <div className="absolute top-3 left-3 bg-white text-xs px-3 py-1 rounded shadow flex items-center space-x-2">
-                        <Star className="w-4 h-4 text-yellow-500" />
-                        <span className="text-sm font-medium">Featured</span>
-                      </div>
-                    )}
                   </div>
 
                   {/* Content */}
@@ -457,7 +428,7 @@ export default function AccommodationsListing() {
                     </div>
 
                     <p className="text-gray-500 mt-3 text-sm leading-relaxed">
-                      {room.excerpt}
+                      {room.description}
                     </p>
 
                     <div className="mt-4 flex flex-wrap gap-3">
@@ -469,55 +440,21 @@ export default function AccommodationsListing() {
                   </div>
 
                   {/* Price / Actions */}
-                  <div className="col-span-12 md:col-span-2 border-l p-5 flex flex-col justify-between">
+                  <div className="col-span-12 md:col-span-2 border-l p-5 flex flex-col justify-center">
                     <div>
                       <div className="text-2xl font-bold text-gray-800 text-right">
-                        {room.currency}
+                        Rwf
                         {room.pricePerNight}
                       </div>
-                      <div className="text-xs text-gray-400 text-right mt-1">
+                      <div className="text-xs text-gray-400 text-center uppercase mt-1">
                         per night
                       </div>
                     </div>
 
                     <div className="mt-4">
-                      <button className="w-full bg-gray-100 border border-gray-200 text-gray-700 py-2 rounded text-sm">
-                        Select Booking Dates
+                      <button className="w-full bg-sky-700 border border-gray-200 text-white py-2 rounded text-sm">
+                        Book Now
                       </button>
-
-                      <button
-                        className="mt-3 w-full text-left text-sm text-gray-500 flex items-center justify-between"
-                        onClick={() =>
-                          setOpenDetails(openDetails === room.id ? null : room.id)
-                        }
-                        aria-expanded={openDetails === room.id}
-                      >
-                        Availability & Details
-                        <ChevronDown
-                          className={`w-4 h-4 ml-2 transition-transform ${
-                            openDetails === room.id ? "rotate-180" : ""
-                          }`}
-                        />
-                      </button>
-
-                      {openDetails === room.id && (
-                        <div className="mt-3 text-sm text-gray-600 bg-gray-50 border border-gray-100 p-3 rounded">
-                          <div className="flex items-center justify-between">
-                            <div>Free cancellation</div>
-                            <div className="font-semibold">
-                              {room.freeCancel ? "Included" : "Not included"}
-                            </div>
-                          </div>
-                          <div className="mt-2 text-xs">
-                            Breakfast available at additional cost.
-                          </div>
-                          {room.instant && (
-                            <div className="mt-2 text-xs text-green-600">
-                              Instant booking available
-                            </div>
-                          )}
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
