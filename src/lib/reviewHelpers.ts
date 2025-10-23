@@ -4,7 +4,6 @@ import {
   calculateAccommodationRating,
   updateAccommodationRating
 } from './supabaseHelpers'
-import { canUserReviewAccommodation } from './newReviewHelpers'
 import { Review } from './supabaseHelpers'
 
 /**

@@ -256,7 +256,7 @@ export default function AnalyticsDashboard() {
 
   useEffect(() => {
     fetchData()
-  }, [dateRange])
+  }, [dateRange, fetchData])
 
   return (
     <ProtectedRoute requiredRole="admin">

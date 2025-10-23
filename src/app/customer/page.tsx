@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import ProtectedRoute from '../components/ProtectedRoute'
 import Link from 'next/link'
@@ -17,25 +17,9 @@ export default function CustomerDashboard() {
   const { user, signOut, loading: authLoading, refreshUser } = useAuth()
   const [bookings, setBookings] = useState<BookingWithDetails[]>([])
   const [loading, setLoading] = useState(true)
+  const hasFetchedBookings = useRef(false)
 
-  useEffect(() => {
-    if (authLoading) return
-    if (!user) {
-      setLoading(false)
-      return
-    }
-    if (user.role !== 'customer') {
-      // Not a customer; do not fetch customer bookings
-      setLoading(false)
-      return
-    }
-    // Refresh then fetch
-    refreshUser().then(() => {
-      fetchBookings()
-    })
-  }, [authLoading, user?.id, user?.role])
-
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
     if (!user) {
       console.warn('No user found, cannot fetch bookings')
       setLoading(false)
@@ -103,7 +87,29 @@ export default function CustomerDashboard() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
+
+  useEffect(() => {
+    if (authLoading) return
+    if (!user) {
+      setLoading(false)
+      return
+    }
+    if (user.role !== 'customer') {
+      // Not a customer; do not fetch customer bookings
+      setLoading(false)
+      return
+    }
+    
+    // Prevent multiple fetches
+    if (hasFetchedBookings.current) return
+    hasFetchedBookings.current = true
+    
+    // Refresh then fetch
+    refreshUser().then(() => {
+      fetchBookings()
+    })
+  }, [authLoading, user?.id, user?.role, fetchBookings, user, refreshUser])
 
   const getStatusColor = (status: string) => {
     switch (status) {

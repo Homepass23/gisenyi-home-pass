@@ -1,12 +1,10 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { User as AppUser, UserRole } from '../lib/supabaseHelpers'
 import { AuthContextType } from '../lib/authTypes'
-import { signInUser, signOutUser, refreshUser, updateUser as updateUserService, updatePassword as updatePasswordService } from '../lib/authService'
-
-
+import { signInUser, signOutUser, refreshUser as refreshUserService, updateUser as updateUserService, updatePassword as updatePasswordService } from '../lib/authService'
 
 // Create context
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -15,11 +13,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AppUser | null>(null)
   const [loading, setLoading] = useState(true)
+  const [initialized, setInitialized] = useState(false)
 
   // Check active session
   useEffect(() => {
-    const getSession = async () => {
+    const initializeAuth = async () => {
+      // Get current session
       const { data: { session } } = await supabase.auth.getSession()
+      
       if (session) {
         // Fetch user details from users table
         const { data: userData, error } = await supabase
@@ -46,10 +47,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           })
         }
       }
+      
+      setInitialized(true)
       setLoading(false)
     }
 
-    getSession()
+    initializeAuth()
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -82,13 +85,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         setUser(null)
       }
-      setLoading(false)
+      
+      // Only set loading to false after initialization
+      if (initialized) {
+        setLoading(false)
+      }
     })
 
     return () => {
       subscription.unsubscribe()
     }
-  }, [])
+  }, [initialized])
 
   // Sign up function
   const signUp = async (userData: {
@@ -161,10 +168,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     if (result.success) {
       // Refresh the user data to get the latest state
-      const updatedUser = await refreshUser();
-      if (updatedUser) {
-        setUser(updatedUser);
-      }
+      await refreshUser();
     }
   }
 
@@ -172,6 +176,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const updatePassword = async (currentPassword: string, newPassword: string) => {
     return await updatePasswordService(currentPassword, newPassword);
   }
+
+  // Memoized refresh user function
+  const refreshUser = useCallback(async () => {
+    const result = await refreshUserService();
+    if (result) {
+      setUser(result);
+    }
+  }, []);
 
   // Role checking helpers
   const isAdmin = Boolean(user?.role === 'admin')
@@ -189,12 +201,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isCustomer,
     updateUser,
     updatePassword,
-    refreshUser: async () => {
-      const result = await refreshUser();
-      if (result) {
-        setUser(result);
-      }
-    }
+    refreshUser
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

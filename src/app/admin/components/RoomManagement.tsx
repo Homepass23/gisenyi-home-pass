@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { toast } from 'sonner'
 import { Plus, Edit, Trash2, Bed, Users, Bath, X } from 'lucide-react'
 import { AccommodationRoom } from '../../../lib/supabaseHelpers'
@@ -9,6 +9,7 @@ import Modal from '../../components/shared/Modal'
 import ImageUpload from '../../components/shared/ImageUpload'
 import { motion, AnimatePresence } from 'framer-motion'
 import AlertDialog from '../../components/ui/AlertDialog'
+import Image from 'next/image'
 
 interface RoomManagementProps {
   accommodationId: string
@@ -45,21 +46,7 @@ export default function RoomManagement({ accommodationId, accommodationTitle, on
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [roomToDelete, setRoomToDelete] = useState<{id: string, name: string} | null>(null)
 
-  useEffect(() => {
-    fetchRooms()
-  }, [accommodationId])
-
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-    document.addEventListener('keydown', handleEscape)
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.removeEventListener('keydown', handleEscape)
-      document.body.style.overflow = 'unset'
-    }
-  }, [onClose])
-
-  const fetchRooms = async () => {
+  const fetchRooms = useCallback(async () => {
     try {
       setLoading(true)
       const { data, error } = await supabaseAdmin
@@ -76,7 +63,21 @@ export default function RoomManagement({ accommodationId, accommodationTitle, on
     } finally {
       setLoading(false)
     }
-  }
+  }, [accommodationId, supabaseAdmin, toast])
+
+  useEffect(() => {
+    fetchRooms()
+  }, [fetchRooms])
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    document.addEventListener('keydown', handleEscape)
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'unset'
+    }
+  }, [onClose])
 
   const handleCreateRoom = () => {
     setEditingRoom(null)
@@ -246,11 +247,14 @@ export default function RoomManagement({ accommodationId, accommodationTitle, on
                     {/* Room Image */}
                     <div className="aspect-video bg-gray-100 relative">
                       {room.image_gallery && room.image_gallery.length > 0 ? (
-                        <img
-                          src={room.image_gallery[0]}
-                          alt={room.room_name}
-                          className="w-full h-full object-cover"
-                        />
+                        <div className="relative w-full h-full">
+                          <Image
+                            src={room.image_gallery[0]}
+                            alt={room.room_name}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
                       ) : (
                         <div className="flex items-center justify-center h-full text-gray-400">
                           <Bed className="h-8 w-8" />

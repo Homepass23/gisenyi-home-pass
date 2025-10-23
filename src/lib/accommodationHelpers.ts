@@ -25,8 +25,8 @@ export async function createNewAccommodation(accommodationData: Partial<Accommod
     throw new Error('Price per night is required')
   }
   
-  if (!accommodationData.host_id) {
-    throw new Error('Host ID is required')
+  if (!accommodationData.owner_id) {
+    throw new Error('Owner ID is required')
   }
   
   // Set default values

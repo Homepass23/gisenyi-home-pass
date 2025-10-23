@@ -34,7 +34,7 @@ async function testStorage() {
     if (!accommodationsBucket) {
       console.log('Creating accommodations bucket...')
       
-      const { data: bucket, error: bucketError } = await supabase.storage.createBucket('accommodations', {
+      const { error: bucketError } = await supabase.storage.createBucket('accommodations', {
         public: true,
         fileSizeLimit: 52428800, // 50MB
         allowedMimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp']

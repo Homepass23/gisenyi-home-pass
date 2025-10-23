@@ -74,7 +74,7 @@ describe('Authentication Service', () => {
       const result = await signUpUser({
         email: 'host@example.com',
         password: 'password123',
-        role: 'owner',
+        role: 'host',
         full_name: 'Test Host',
         phone_number: '1234567890',
         street_address: '123 Test St',

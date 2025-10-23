@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers'
 import { supabaseAdmin } from './supabaseClient'
 
-export async function requireAdmin(request: Request): Promise<{ userId: string }>{
-  const cookieStore = cookies()
+export async function requireAdmin(): Promise<{ userId: string }>{
+  const cookieStore = await cookies()
   const accessToken = cookieStore.get('sb-access-token')?.value
   if (!accessToken) {
     throw new Error('Unauthorized')

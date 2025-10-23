@@ -5,7 +5,7 @@ import { supabaseAdmin } from '../../../../lib/supabaseClient'
 
 export async function GET(request: Request) {
   try {
-    await requireAdmin(request)
+    await requireAdmin()
     const { searchParams } = new URL(request.url)
     const ownerId = searchParams.get('ownerId')
     let query = supabaseAdmin.from('accommodations').select('*').order('created_at', { ascending: false })
@@ -22,7 +22,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    await requireAdmin(request)
+    await requireAdmin()
     const body = await request.json()
     const data = await createAccommodation(body)
     return NextResponse.json({ success: true, data })
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
-    await requireAdmin(request)
+    await requireAdmin()
     const body = await request.json()
     const { id, ...rest } = body
     if (!id) return NextResponse.json({ success: false, error: 'Accommodation id required' }, { status: 400 })
@@ -50,7 +50,7 @@ export async function PATCH(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
-    await requireAdmin(request)
+    await requireAdmin()
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
     if (!id) return NextResponse.json({ success: false, error: 'Accommodation id required' }, { status: 400 })

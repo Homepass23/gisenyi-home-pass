@@ -65,7 +65,7 @@ const PropertyCard = () => {
       <section className="px-4 sm:px-6 py-12 sm:py-16 md:py-20 bg-gray-50">
         <div className='w-full max-w-6xl mx-auto text-center'>
           <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h2 className="text-2xl sm:text-3xl font-bold">Our guests' favorites</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold">Our guests&apos; favorites</h2>
             <div className="flex flex-wrap items-center gap-2 sm:gap-4">
               <button className="text-white py-2 px-4 sm:px-6 md:px-8 bg-sky-600 hover:bg-sky-900 font-semibold rounded-md transition text-sm sm:text-base">
                 All
@@ -89,7 +89,7 @@ const PropertyCard = () => {
       <section className="px-4 sm:px-6 py-12 sm:py-16 md:py-20 bg-gray-50">
         <div className='w-full max-w-6xl mx-auto text-center'>
           <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h2 className="text-2xl sm:text-3xl font-bold">Our guests' favorites</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold">Our guests&apos; favorites</h2>
             <div className="flex flex-wrap items-center gap-2 sm:gap-4">
               <button className="text-white py-2 px-4 sm:px-6 md:px-8 bg-sky-600 hover:bg-sky-900 font-semibold rounded-md transition text-sm sm:text-base">
                 All
@@ -116,7 +116,7 @@ const PropertyCard = () => {
       <section className="px-4 sm:px-6 py-12 sm:py-16 md:py-20 bg-gray-50">
         <div className='w-full max-w-6xl mx-auto text-center'>
           <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h2 className="text-2xl sm:text-3xl font-bold">Our guests' favorites</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold">Our guests&apos; favorites</h2>
             <div className="flex flex-wrap items-center gap-2 sm:gap-4">
               <button className="text-white py-2 px-4 sm:px-6 md:px-8 bg-sky-600 hover:bg-sky-900 font-semibold rounded-md transition text-sm sm:text-base">
                 All
@@ -141,7 +141,7 @@ const PropertyCard = () => {
     <section className="px-4 sm:px-6 py-12 sm:py-16 md:py-20 bg-gray-50">
       <div className='w-full max-w-6xl mx-auto text-center'>
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h2 className="text-2xl sm:text-3xl font-bold">Our guests' favorites</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold">Our guests&apos; favorites</h2>
           <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             <button 
               className={`py-2 px-4 sm:px-6 md:px-8 font-semibold rounded-md transition text-sm sm:text-base ${

@@ -20,7 +20,7 @@ async function setupStorage() {
     console.log('Setting up Supabase storage...')
     
     // Create accommodations bucket if it doesn't exist
-    const { data: bucket, error: bucketError } = await supabase
+    const { error: bucketError } = await supabase
       .storage
       .createBucket('accommodations', {
         public: true,
