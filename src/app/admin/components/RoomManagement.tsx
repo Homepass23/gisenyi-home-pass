@@ -27,11 +27,24 @@ interface RoomFormData {
   image_gallery: string[]
 }
 
+/**
+ * Helper to get a stable client-side uid:
+ * - prefer server id when available and non-empty
+ * - otherwise use crypto.randomUUID() when available
+ * - fallback to a deterministic random string
+ */
+const getUid = (maybeId?: string, fallbackSeed?: string) => {
+  if (maybeId && typeof maybeId === 'string' && maybeId.trim() !== '') return maybeId.trim()
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return `temp-${crypto.randomUUID()}`
+  // fallback
+  return `temp-${(fallbackSeed || '')}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+}
+
 export default function RoomManagement({ accommodationId, accommodationTitle, onClose }: RoomManagementProps) {
-  const [rooms, setRooms] = useState<AccommodationRoom[]>([])
+  const [rooms, setRooms] = useState<(AccommodationRoom & { _uid: string })[]>([])
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingRoom, setEditingRoom] = useState<AccommodationRoom | null>(null)
+  const [editingRoom, setEditingRoom] = useState<(AccommodationRoom & { _uid?: string }) | null>(null)
   const [formData, setFormData] = useState<RoomFormData>({
     room_name: '',
     description: '',
@@ -56,14 +69,27 @@ export default function RoomManagement({ accommodationId, accommodationTitle, on
         .order('created_at', { ascending: true })
 
       if (error) throw error
-      setRooms(data || [])
+
+      // normalize rooms and attach a stable _uid
+      const normalized = (data || []).map((room: AccommodationRoom) => {
+        const uid = getUid(room.id, `${room.room_name || 'room'}`)
+        return {
+          ...room,
+          price_per_night: room.price_per_night || 0,
+          num_of_guests: room.num_of_guests || 1,
+          num_of_beds: room.num_of_beds || 1,
+          _uid: uid
+        }
+      })
+
+      setRooms(normalized)
     } catch (error) {
       console.error('Error fetching rooms:', error)
       toast.error('Failed to load rooms. Please try again.')
     } finally {
       setLoading(false)
     }
-  }, [accommodationId, supabaseAdmin, toast])
+  }, [accommodationId])
 
   useEffect(() => {
     fetchRooms()
@@ -93,7 +119,7 @@ export default function RoomManagement({ accommodationId, accommodationTitle, on
     setIsModalOpen(true)
   }
 
-  const handleEditRoom = (room: AccommodationRoom) => {
+  const handleEditRoom = (room: AccommodationRoom & { _uid?: string }) => {
     setEditingRoom(room)
     setFormData({
       room_name: room.room_name,
@@ -112,7 +138,7 @@ export default function RoomManagement({ accommodationId, accommodationTitle, on
     setDeleteDialogOpen(true)
   }
 
-  const handleDeleteRoomConfirm = async () => {
+  const handleDeleteRoomConfirm = useCallback(async () => {
     if (!roomToDelete) return
     try {
       const { error } = await supabaseAdmin
@@ -130,9 +156,9 @@ export default function RoomManagement({ accommodationId, accommodationTitle, on
       setRoomToDelete(null)
       setDeleteDialogOpen(false)
     }
-  }
+  }, [roomToDelete, fetchRooms])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setFormLoading(true)
     setError(null)
@@ -163,7 +189,7 @@ export default function RoomManagement({ accommodationId, accommodationTitle, on
         toast.success('Room created successfully!')
       }
 
-      fetchRooms()
+      await fetchRooms()
       setIsModalOpen(false)
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An error occurred')
@@ -171,7 +197,7 @@ export default function RoomManagement({ accommodationId, accommodationTitle, on
     } finally {
       setFormLoading(false)
     }
-  }
+  }, [editingRoom, formData, accommodationId, fetchRooms])
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target
@@ -179,7 +205,7 @@ export default function RoomManagement({ accommodationId, accommodationTitle, on
 
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : type === 'number' ? parseFloat(value) || 0 : value
+      [name]: type === 'checkbox' ? checked : type === 'number' ? parseFloat(value as string) || 0 : value
     }))
   }
 
@@ -222,7 +248,6 @@ export default function RoomManagement({ accommodationId, accommodationTitle, on
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-6">
-            {/* Add Room Button */}
             <div className="mb-6">
               <button
                 onClick={handleCreateRoom}
@@ -233,7 +258,6 @@ export default function RoomManagement({ accommodationId, accommodationTitle, on
               </button>
             </div>
 
-            {/* Rooms List */}
             {loading ? (
               <div className="text-center py-8">Loading rooms...</div>
             ) : rooms.length === 0 ? (
@@ -242,72 +266,74 @@ export default function RoomManagement({ accommodationId, accommodationTitle, on
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {rooms.map((room) => (
-                  <div key={room.id} className="bg-white border rounded-lg shadow-sm overflow-hidden">
-                    {/* Room Image */}
-                    <div className="aspect-video bg-gray-100 relative">
-                      {room.image_gallery && room.image_gallery.length > 0 ? (
-                        <div className="relative w-full h-full">
-                          <Image
-                            src={room.image_gallery[0]}
-                            alt={room.room_name}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-center h-full text-gray-400">
-                          <Bed className="h-8 w-8" />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Room Details */}
-                    <div className="p-4">
-                      <h3 className="font-semibold text-lg mb-2">{room.room_name}</h3>
-                      {room.description && (
-                        <p className="text-gray-600 text-sm mb-3 line-clamp-2">{room.description}</p>
-                      )}
-                      
-                      <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-                        <div className="flex items-center">
-                          <Users className="h-4 w-4 mr-1" />
-                          {room.num_of_guests} guests
-                        </div>
-                        <div className="flex items-center">
-                          <Bed className="h-4 w-4 mr-1" />
-                          {room.num_of_beds} beds
-                        </div>
-                        {room.private_bathroom && (
-                          <div className="flex items-center">
-                            <Bath className="h-4 w-4 mr-1" />
-                            Private
+                {rooms.map((room) => {
+                  // use the stable client-side _uid
+                  const key = room._uid
+                  return (
+                    <div key={key} className="bg-white border rounded-lg shadow-sm overflow-hidden">
+                      <div className="aspect-video bg-gray-100 relative">
+                        {room.image_gallery && room.image_gallery.length > 0 ? (
+                          <div className="relative w-full h-full">
+                            <Image
+                              src={room.image_gallery[0]}
+                              alt={room.room_name}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center h-full text-gray-400">
+                            <Bed className="h-8 w-8" />
                           </div>
                         )}
                       </div>
 
-                      <div className="flex items-center justify-between">
-                        <span className="text-lg font-bold text-sky-600">
-                          Rwf {room.price_per_night.toLocaleString()}/night
-                        </span>
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => handleEditRoom(room)}
-                            className="text-blue-600 hover:text-blue-800"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteRoomClick(room.id, room.room_name)}
-                            className="text-red-600 hover:text-red-800"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
+                      <div className="p-4">
+                        <h3 className="font-semibold text-lg mb-2">{room.room_name}</h3>
+                        {room.description && (
+                          <p className="text-gray-600 text-sm mb-3 line-clamp-2">{room.description}</p>
+                        )}
+                        
+                        <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+                          <div className="flex items-center">
+                            <Users className="h-4 w-4 mr-1" />
+                            {room.num_of_guests} guests
+                          </div>
+                          <div className="flex items-center">
+                            <Bed className="h-4 w-4 mr-1" />
+                            {room.num_of_beds} beds
+                          </div>
+                          {room.private_bathroom && (
+                            <div className="flex items-center">
+                              <Bath className="h-4 w-4 mr-1" />
+                              Private
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <span className="text-lg font-bold text-sky-600">
+                            Rwf {room.price_per_night.toLocaleString()}/night
+                          </span>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handleEditRoom(room)}
+                              className="text-blue-600 hover:text-blue-800"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteRoomClick(room.id, room.room_name)}
+                              className="text-red-600 hover:text-red-800"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

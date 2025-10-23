@@ -6,10 +6,10 @@ import { supabaseAdmin } from '../../../../../../lib/supabaseClient'
 // Hosts can update status of bookings that belong to their accommodations
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    const bookingId = params.id
+    const bookingId = context.params.id
     const body = await request.json()
     const { status } = body as { status?: 'confirmed' | 'rejected' | 'cancelled' }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../../../context/AuthContext'
 import ProtectedRoute from '../../components/ProtectedRoute'
 import { 
@@ -79,7 +79,7 @@ export default function AnalyticsDashboard() {
   const [loading, setLoading] = useState(true)
 
   // Calculate date range for queries
-  const getDateRange = () => {
+  const getDateRange = useCallback(() => {
     const endDate = new Date()
     const startDate = new Date()
     
@@ -99,9 +99,9 @@ export default function AnalyticsDashboard() {
     }
     
     return { startDate, endDate }
-  }
+  }, [dateRange])
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true)
       const { startDate, endDate } = getDateRange()
@@ -202,10 +202,10 @@ export default function AnalyticsDashboard() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [getDateRange])
 
   // Helper function to calculate trend
-  const calculateTrend = (data: { created_at: string }[]) => {
+  const calculateTrend = useCallback((data: { created_at: string }[]) => {
     if (data.length === 0) return '+0%'
     
     // Simplified trend calculation - compare first and second half
@@ -217,10 +217,10 @@ export default function AnalyticsDashboard() {
     
     const percentage = Math.round(((secondHalf - firstHalf) / firstHalf) * 100)
     return `${percentage >= 0 ? '+' : ''}${percentage}%`
-  }
+  }, [])
 
   // Helper function to generate chart data
-  const generateChartData = (data: { created_at: string; accommodation_id?: string }[], type: string, accommodations?: { id: string; price_per_night: number }[]) => {
+  const generateChartData = useCallback((data: { created_at: string; accommodation_id?: string }[], type: string, accommodations?: { id: string; price_per_night: number }[]) => {
     // Group data by date
     const grouped: Record<string, number> = {}
     
@@ -248,7 +248,7 @@ export default function AnalyticsDashboard() {
         [type]: value
       } as ChartData))
       .sort((a, b) => a.date.localeCompare(b.date))
-  }
+  }, [])
 
   const handleDateRangeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setDateRange(e.target.value as '7d' | '30d' | '90d' | '1y')

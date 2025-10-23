@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState, useCallback } from 'react'
 import ProtectedRoute from '../../components/ProtectedRoute'
 import { useAuth } from '../../../context/AuthContext'
 import { supabase } from '../../../lib/supabaseClient'
@@ -20,12 +20,7 @@ export default function OwnerAccommodations() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [accommodationToDelete, setAccommodationToDelete] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (!user) return
-    fetchAccommodations()
-  }, [user])
-
-  const fetchAccommodations = async () => {
+  const fetchAccommodations = useCallback(async () => {
     try {
       setLoading(true)
       const { data, error } = await supabase
@@ -41,7 +36,12 @@ export default function OwnerAccommodations() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
+
+  useEffect(() => {
+    if (!user) return
+    fetchAccommodations()
+  }, [user, fetchAccommodations])
 
   const handleCreate = () => {
     setEditingAccommodation(null)
@@ -58,7 +58,7 @@ export default function OwnerAccommodations() {
     setDeleteDialogOpen(true)
   }
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = useCallback(async () => {
     if (!user || !accommodationToDelete) return
     try {
       const { error } = await supabase
@@ -75,9 +75,9 @@ export default function OwnerAccommodations() {
       setAccommodationToDelete(null)
       setDeleteDialogOpen(false)
     }
-  }
+  }, [user, accommodationToDelete, fetchAccommodations])
 
-  const handleSaveAccommodation = async (data: Partial<Accommodation>) => {
+  const handleSaveAccommodation = useCallback(async (data: Partial<Accommodation>) => {
     if (!user) return
     if (editingAccommodation) {
       // Update existing, enforce ownership
@@ -95,7 +95,7 @@ export default function OwnerAccommodations() {
       if (error) throw error
     }
     await fetchAccommodations()
-  }
+  }, [user, editingAccommodation, fetchAccommodations])
 
   const filtered = useMemo(() => {
     const term = searchTerm.toLowerCase()

@@ -19,15 +19,21 @@ import AccommodationForm from '../components/AccommodationForm'
 import RoomManagement from '../components/RoomManagement'
 import AlertDialog from '../../components/ui/AlertDialog'
 
+const getUid = (maybeId?: string, fallbackSeed?: string) => {
+  if (maybeId && typeof maybeId === 'string' && maybeId.trim() !== '') return maybeId.trim()
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return `temp-${crypto.randomUUID()}`
+  return `temp-${(fallbackSeed || '')}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+}
+
 export default function AccommodationsManagement() {
   const { user } = useAuth()
-  const [accommodations, setAccommodations] = useState<Accommodation[]>([])
+  const [accommodations, setAccommodations] = useState<(Accommodation & { _uid: string })[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingAccommodation, setEditingAccommodation] = useState<Accommodation | null>(null)
   const [showRoomManagement, setShowRoomManagement] = useState(false)
-  const [selectedAccommodation, setSelectedAccommodation] = useState<Accommodation | null>(null)
+  const [selectedAccommodation, setSelectedAccommodation] = useState<Accommodation & { _uid?: string } | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [accommodationToDelete, setAccommodationToDelete] = useState<{id: string, title: string} | null>(null)
 
@@ -44,8 +50,13 @@ export default function AccommodationsManagement() {
         .order('created_at', { ascending: false })
       
       if (error) throw error
+
+      const normalized = (data || []).map((acc) => ({
+        ...acc,
+        _uid: getUid(acc.id, acc.title || 'acc')
+      }))
       
-      setAccommodations(data || [])
+      setAccommodations(normalized)
     } catch (error) {
       console.error('Error fetching accommodations:', error)
       toast.error('Failed to load accommodations. Please try again.')
@@ -64,7 +75,7 @@ export default function AccommodationsManagement() {
     setIsModalOpen(true)
   }
 
-  const handleManageRooms = (accommodation: Accommodation) => {
+  const handleManageRooms = (accommodation: Accommodation & { _uid?: string }) => {
     setSelectedAccommodation(accommodation)
     setShowRoomManagement(true)
   }
@@ -85,7 +96,6 @@ export default function AccommodationsManagement() {
       if (error) throw error
       
       toast.success('Accommodation deleted successfully!')
-      // Refresh the list
       fetchAccommodations()
     } catch (error) {
       console.error('Error deleting accommodation:', error)
@@ -100,7 +110,6 @@ export default function AccommodationsManagement() {
     try {
       let result;
       if (editingAccommodation) {
-        // Update existing accommodation
         const { data: updatedData, error } = await supabaseAdmin
           .from('accommodations')
           .update({ ...data, updated_at: new Date().toISOString() })
@@ -111,7 +120,6 @@ export default function AccommodationsManagement() {
         result = updatedData?.[0]
         toast.success('Accommodation updated successfully!')
       } else {
-        // Create new accommodation
         const { data: createdData, error } = await supabaseAdmin
           .from('accommodations')
           .insert(data)
@@ -122,10 +130,7 @@ export default function AccommodationsManagement() {
         toast.success('Accommodation created successfully!')
       }
       
-      // Refresh the list
-      fetchAccommodations()
-      
-      // Return the accommodation data so the form can use it
+      await fetchAccommodations()
       return result
     } catch (error) {
       console.error('Error saving accommodation:', error)
@@ -135,8 +140,8 @@ export default function AccommodationsManagement() {
   }
 
   const filteredAccommodations = accommodations.filter(acc => 
-    acc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (acc.location && acc.location.toLowerCase().includes(searchTerm.toLowerCase()))
+    (acc.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (acc.location || '').toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   return (
@@ -155,7 +160,6 @@ export default function AccommodationsManagement() {
           </div>
 
           <div className="flex-1 overflow-y-auto p-6">
-            {/* Header with Search and Actions */}
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
@@ -186,7 +190,6 @@ export default function AccommodationsManagement() {
               </div>
             </div>
 
-            {/* Accommodations Table */}
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               {loading ? (
                 <div className="p-6 text-center">
@@ -197,30 +200,18 @@ export default function AccommodationsManagement() {
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Property
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Location
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Price/Night
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Rating
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Created
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Property</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price/Night</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {filteredAccommodations.length > 0 ? (
                         filteredAccommodations.map((accommodation) => (
-                          <tr key={accommodation.id}>
+                          <tr key={accommodation._uid}>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="text-sm font-medium text-gray-900">{accommodation.title}</div>
                             </td>
@@ -228,15 +219,15 @@ export default function AccommodationsManagement() {
                               {accommodation.location || 'Not specified'}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              Rwf {accommodation.price_per_night.toLocaleString()}
+                              Rwf {accommodation.price_per_night?.toLocaleString?.() || '0'}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                {accommodation.rating}
+                                {accommodation.rating ?? '—'}
                               </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {new Date(accommodation.created_at).toLocaleDateString()}
+                              {accommodation.created_at ? new Date(accommodation.created_at).toLocaleDateString() : '—'}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                               <div className="flex space-x-2">
@@ -283,7 +274,6 @@ export default function AccommodationsManagement() {
         </div>
       </div>
       
-      {/* Accommodation Form Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -297,7 +287,6 @@ export default function AccommodationsManagement() {
         />
       </Modal>
 
-      {/* Room Management Modal */}
       {showRoomManagement && selectedAccommodation && (
         <RoomManagement
           accommodationId={selectedAccommodation.id}
@@ -309,7 +298,6 @@ export default function AccommodationsManagement() {
         />
       )}
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog
         isOpen={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}

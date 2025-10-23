@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import ProtectedRoute from '../components/ProtectedRoute'
 import { supabase } from '../../lib/supabaseClient'
@@ -17,14 +17,7 @@ export default function OwnerDashboard() {
   const [loadingAccommodations, setLoadingAccommodations] = useState(true)
   const [loadingBookings, setLoadingBookings] = useState(true)
 
-  useEffect(() => {
-    if (!user) return
-    
-    fetchAccommodations()
-    fetchBookings()
-  }, [user])
-
-  const fetchAccommodations = async () => {
+  const fetchAccommodations = useCallback(async () => {
     try {
       setLoadingAccommodations(true)
       const { data, error } = await supabase
@@ -40,9 +33,9 @@ export default function OwnerDashboard() {
     } finally {
       setLoadingAccommodations(false)
     }
-  }
+  }, [user])
 
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
     try {
       setLoadingBookings(true)
       const { data, error } = await supabase
@@ -67,7 +60,14 @@ export default function OwnerDashboard() {
     } finally {
       setLoadingBookings(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    if (!user) return
+    
+    fetchAccommodations()
+    fetchBookings()
+  }, [user, fetchAccommodations, fetchBookings])
 
   const getStatusColor = (status: string) => {
     switch (status) {
