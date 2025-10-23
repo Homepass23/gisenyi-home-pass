@@ -3,7 +3,7 @@
 
 import HeroSection from './components/HeroSection'
 import React from 'react'
-import PropertyCard from './components/PropertyCard'
+import PropertyCard from './components/features/PropertyCard'
 import TestimonialsSection from './components/Testimonials'
 import FaqSection from './components/faq'
 import WhyChooseUs from './components/whychooseus'

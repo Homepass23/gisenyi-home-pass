@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import SearchBar from './SearchBar'
-import type { HeroSlide } from '../types/hero-slide'
+import SearchBar from './ui/SearchBar'
+import type { HeroSlide } from '../../types/hero-slide'
 
 const slides: HeroSlide[] = [
   {
@@ -35,7 +35,7 @@ const HeroSection = () => {
   }, [])
 
   return (
-    <section className="relative mt-20 w-full h-screen overflow-hidden text-white">
+    <section className="relative w-full h-screen overflow-hidden text-white">
       {/* Backgrounds */}
       {slides.map((slide, index) => (
         <div
@@ -50,36 +50,41 @@ const HeroSection = () => {
             fill
             className="object-cover"
             priority={index === 0}
+            sizes="100vw"
+            onError={(e) => {
+              // Fallback to a default image if the image fails to load
+              const target = e.target as HTMLImageElement;
+              target.src = '/images/cozy.jpg';
+            }}
           />
-          <div className="absolute inset-0 bg-sky-950/60" />
+          {/* Full background overlay */}
+          <div className="absolute inset-0 bg-slate-800/30" />
+          {/* Navbar area overlay - more opaque for better visibility */}
+          <div className="absolute top-0 left-0 right-0 h-19 bg-slate-800/20" />
         </div>
       ))}
 
       {/* Slide Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 pt-28 pb-12 transition-all duration-700 ease-in-out">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 md:pt-34 pb-8 transition-all duration-700 ease-in-out">
 
-        <h1 className="text-6xl max-w-2xl font-bold leading-tight mt-8 mb-6">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl max-w-2xl font-bold leading-tight mt-4 sm:mt-6 md:mt-8 mb-4 sm:mb-6">
           {slides[current].title}
         </h1>
 
-        <p className="text-md md:text-md max-w-2xl mb-6 italic text-gray-100">
+        <p className="text-sm sm:text-base md:text-md max-w-2xl mb-4 sm:mb-6 italic text-gray-100 leading-relaxed">
             {slides[current].description}
         </p>
-
-        <button className="text-white max-w-2xl font-bold bg-sky-500 hover:bg-sky-600 py-2 px-6 rounded-md hover:cursor-pointer transition">
-            View Accommodations
-        </button>
       </div>
 
       {/* Search Bar */}
       <SearchBar />
 
       {/* Tracker dots */}
-      <div className="absolute top-1/2 right-6 transform -translate-y-1/2 z-10 flex flex-col gap-3">
+      <div className="absolute top-1/2 right-4 sm:right-6 transform -translate-y-1/2 z-10 flex flex-col gap-2 sm:gap-3">
         {slides.map((_, i) => (
           <button
             key={i}
-            className={`w-3 h-3 rounded-full transition-all duration-300 border-2 ${
+            className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300 border-2 ${
               i === current
                 ? 'bg-white border-white scale-110'
                 : 'border-white/50 bg-white/30 hover:bg-white/70'

@@ -1,19 +1,18 @@
 import type { Metadata } from "next";
-import { Lato } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
-import HeaderNav from './components/HeaderNav'
-import React from "react";
-import Footer from "./components/footer";
 
-const lato = Lato({
-  variable: "--font-sans",
-  subsets: ["latin"],
-  weight: ["400", "700"], // You can include other weights if you want
-});
+import { AuthProvider } from "../context/AuthContext";
+import HeaderNav from "./components/layout/HeaderNav";
+import Footer from "./components/layout/footer";
+import ReactQueryProvider from "./providers/ReactQueryProvider";
+import { Toaster } from "sonner";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Gisenyi Home Pass",
-  description: "Discover your perfect homestay in Gisenyi, Rwanda. Experience comfort, culture, and community with us.",
+  description: "Find your perfect accommodation in Gisenyi",
 };
 
 export default function RootLayout({
@@ -23,13 +22,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${lato.variable} antialiased`}
-      >
-        <HeaderNav />
-        {children}
-        <Footer />
-        {/* Add any global scripts or components here */}
+      <body className={inter.className}>
+        <ReactQueryProvider>
+          <AuthProvider>
+            <HeaderNav />
+            {children}
+            <Footer />
+            <Toaster position="top-right" richColors />
+          </AuthProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );
