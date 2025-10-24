@@ -10,7 +10,7 @@ const ContactSection: React.FC = () => {
               <section className="relative h-[32vh] md:h-[40vh] mb-12 w-full overflow-hidden">
               {/* Background image */}
               <Image
-                  src="/images/Room2.1.jpg"                 // put your banner image here
+                  src="/images/Room0.1.jpg"                 // put your banner image here
                   alt="Lake Kivu home interior"
                   fill
                   priority

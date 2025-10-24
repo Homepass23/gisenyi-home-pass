@@ -1,6 +1,6 @@
 // ContactInfo.tsx
 
-import { FaMapMarkerAlt, FaEnvelope, FaPhoneAlt, FaUsers } from 'react-icons/fa'
+import { FaMapMarkerAlt, FaEnvelope, FaPhoneAlt, FaFacebookF, FaTwitter, FaYoutube } from 'react-icons/fa'
 import React from 'react'
 
 type ContactItem = {
@@ -11,24 +11,28 @@ type ContactItem = {
 
 const contactInfo: ContactItem[] = [
   {
-    icon: <FaMapMarkerAlt className="text-xl text-sky-500" />,
+    icon: <FaMapMarkerAlt className="text-md text-sky-500" />,
     title: 'Office location',
-    lines: ['16122 Collins Street,', 'Melbourne, Australia'],
+    lines: ['8724+V8X, Rue de Industrie, Gisenyi'],
   },
   {
-    icon: <FaEnvelope className="text-xl text-sky-500" />,
+    icon: <FaEnvelope className="text-md text-sky-500" />,
     title: 'Send a message',
-    lines: ['info@yourdomain.com', 'sales@yourdomain.com'],
+    lines: ['wanderwise641@gmail.com'],
   },
   {
-    icon: <FaPhoneAlt className="text-xl text-sky-500" />,
+    icon: <FaPhoneAlt className="text-md text-sky-500" />,
     title: 'Call us directly',
-    lines: ['1-800–222–000', '1-800–222–002'],
+    lines: ['+250789830676'],
   },
   {
-    icon: <FaUsers className="text-xl text-sky-500" />,
+    icon: <div className="flex flex-col gap-1">
+      <FaFacebookF className="text-sky-500" />
+      <FaTwitter className="text-sky-500" />
+      <FaYoutube className="text-sky-500" />
+    </div>,
     title: 'Find us on social media',
-    lines: ['hire@yourdomain.com', 'hr@yourdomain.com'],
+    lines: ['Follow us on social platforms'],
   },
 ]
 

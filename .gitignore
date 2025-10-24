@@ -23,6 +23,13 @@
 # misc
 .DS_Store
 *.pem
+*.log
+logs
+*.tmp
+*.temp
+.env
+.env*.local
+!.env.example
 
 # debug
 npm-debug.log*
@@ -39,3 +46,46 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+._*
+
+# Supabase local development
+supabase/.temp
+supabase/.branches
+supabase/.fallback
+supabase/.git
+supabase/.github
+supabase/docker/volumes/api/jwtkeys
+supabase/docker/volumes/db/data
+supabase/docker/volumes/functions/_temp
+supabase/docker/volumes/logs
+supabase/docker/volumes/pooler/log
+supabase/.env
+supabase/.env.local
+supabase/.env.docker
+supabase/.env.test
+supabase/.env.development
+supabase/.env.production
+
+# Local databases and cache
+*.sqlite
+*.sqlite3
+*.db
+.cache
+
+# Uploads and temporary files
+uploads/
+tmp/
+temp/

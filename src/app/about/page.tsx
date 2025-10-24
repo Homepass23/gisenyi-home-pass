@@ -12,7 +12,7 @@ export default function AboutPage() {
         <section className="relative h-[32vh] md:h-[50vh] w-full overflow-hidden">
         {/* Background image */}
         <Image
-            src="/images/Room2.1.jpg"                 // put your banner image here
+            src="/images/Room0.jpg"                 // put your banner image here
             alt="Lake Kivu home interior"
             fill
             priority
@@ -20,7 +20,7 @@ export default function AboutPage() {
         />
 
         {/* Soft white wash to match the screenshot’s faded look */}
-        <div className="absolute inset-0 bg-gradient-to-b from-cyan-950/80 via-white/40 to-white/70 md:from-white/60 md:via-white/30 md:to-white/60 backdrop-blur-[1px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-cyan-950/80 via-white/40 to-white/70 md:from-white/60 md:via-white/30 md:to-white/60 backdrop-blur-[3px]" />
 
         {/* Title */}
         <div className="absolute inset-0 flex items-center justify-center">
@@ -107,7 +107,7 @@ export default function AboutPage() {
             </p>
             <p className="text-gray-600 leading-7 mt-6">
               Hosts manage listings with an intuitive workflow—update calendars and pricing,
-              receive instant booking alerts, chat with guests, and track earnings. Admin tools
+              receive booking alerts, chat with guests, and track earnings. Admin tools
               support property approval, quality control, commissions, and performance analytics.
             </p>
           </div>

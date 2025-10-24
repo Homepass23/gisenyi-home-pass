@@ -3,6 +3,8 @@ import Image from "next/image";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
+
+// Import Swiper styles
 import "swiper/css";
 import "swiper/css/pagination";
 
@@ -40,7 +42,6 @@ export default function Gallery() {
                   src={src}
                   alt={`Gallery Image ${i + 1}`}
                   fill
-                  objectFit="cover"
                   className="object-cover transform hover:scale-105 transition duration-500"
                 />
               </div>

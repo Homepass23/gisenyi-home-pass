@@ -7,6 +7,7 @@ const Message = () => {
     name: "",
     email: "",
     phone: "",
+    subject: "",
     comment: "",
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -30,6 +31,11 @@ const Message = () => {
       newErrors.email = "Enter a valid email address.";
     }
 
+    if (!form.subject.trim() || form.subject.trim().length < 3) {
+      newErrors.subject = "Subject must be at least 3 characters.";
+    }
+
+    // Phone validation is optional - only validate if provided
     if (form.phone && !/^[0-9+\-\s()]*$/.test(form.phone)) {
       newErrors.phone = "Phone number contains invalid characters.";
     }
@@ -52,17 +58,26 @@ const Message = () => {
 
     setLoading(true);
 
-    const res = await fetch("/admin/api/messages", {
+    // Prepare data for submission (include phone now that it's in the database)
+    const submitData = {
+      name: form.name,
+      email: form.email,
+      phone: form.phone,
+      subject: form.subject,
+      comment: form.comment
+    };
+
+    const res = await fetch("/api/inquiries", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify(submitData),
     });
 
     setLoading(false);
 
     if (res.ok) {
       toast.success("Message sent successfully! 🎉");
-      setForm({ name: "", email: "", phone: "", comment: "" });
+      setForm({ name: "", email: "", phone: "", subject: "", comment: "" });
     } else {
       const { error } = await res.json();
       toast.error("Error: " + error);
@@ -109,7 +124,7 @@ const Message = () => {
           <input
             type="tel"
             name="phone"
-            placeholder="Phone number"
+            placeholder="Phone number (optional)"
             value={form.phone}
             onChange={handleChange}
             className="w-full px-4 py-3 border rounded-full"
@@ -118,6 +133,21 @@ const Message = () => {
             <p className="text-sky-500 text-sm mt-1">{errors.phone}</p>
           )}
         </div>
+        
+        <div>
+          <input
+            type="text"
+            name="subject"
+            placeholder="Subject"
+            value={form.subject}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border rounded-full"
+          />
+          {errors.subject && (
+            <p className="text-sky-500 text-sm mt-1">{errors.subject}</p>
+          )}
+        </div>
+
 
         <div>
           <textarea
