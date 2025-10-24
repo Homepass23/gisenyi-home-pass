@@ -132,8 +132,8 @@ export default function ImageUpload({
       {/* Image Preview Grid */}
       {images.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {images.map((imageUrl, index) => (
-            <div key={index} className="relative group">
+          {images.filter(url => url && url.trim() !== '').map((imageUrl, index) => (
+            <div key={imageUrl} className="relative group">
               <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
                 <Image
                   src={imageUrl}
