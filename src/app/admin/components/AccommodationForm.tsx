@@ -7,6 +7,14 @@ import RoomManagement from './RoomManagement'
 import { Plus } from 'lucide-react'
 import { supabaseAdmin } from '../../../lib/supabaseClient'
 
+interface HostBasicInfo {
+  id: string
+  full_name: string | null
+  email: string
+  role: string
+  verified: boolean
+}
+
 interface AccommodationFormProps {
   accommodation?: Accommodation | null
   onSubmit: (data: Partial<Accommodation>) => Promise<void>
@@ -38,7 +46,7 @@ export default function AccommodationForm({ accommodation, onSubmit, onCancel }:
   const [error, setError] = useState<string | null>(null)
   const [galleryImages, setGalleryImages] = useState<string[]>([])
   const [showRoomManagement, setShowRoomManagement] = useState(false)
-  const [activeHosts, setActiveHosts] = useState<User[]>([])
+  const [activeHosts, setActiveHosts] = useState<HostBasicInfo[]>([])
   const [loadingHosts, setLoadingHosts] = useState(false)
 
   useEffect(() => {
