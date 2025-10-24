@@ -101,6 +101,52 @@ export default function AnalyticsDashboard() {
     return { startDate, endDate }
   }, [dateRange])
 
+  // Helper function to calculate trend
+  const calculateTrend = useCallback((data: { created_at: string }[]) => {
+    if (data.length === 0) return '+0%'
+    
+    // Simplified trend calculation - compare first and second half
+    const midpoint = Math.floor(data.length / 2)
+    const firstHalf = data.slice(0, midpoint).length
+    const secondHalf = data.slice(midpoint).length
+    
+    if (firstHalf === 0) return '+0%'
+    
+    const percentage = Math.round(((secondHalf - firstHalf) / firstHalf) * 100)
+    return `${percentage >= 0 ? '+' : ''}${percentage}%`
+  }, [])
+
+  // Helper function to generate chart data
+  const generateChartData = useCallback((data: { created_at: string; accommodation_id?: string }[], type: string, accommodations?: { id: string; price_per_night: number }[]) => {
+    // Group data by date
+    const grouped: Record<string, number> = {}
+    
+    data.forEach(item => {
+      const date = new Date(item.created_at).toISOString().split('T')[0]
+      if (!grouped[date]) {
+        grouped[date] = 0
+      }
+      
+      if (type === 'amount' && accommodations) {
+        // Find accommodation price for this booking
+        const accommodation = accommodations.find(acc => acc.id === item.accommodation_id)
+        if (accommodation) {
+          grouped[date] += parseFloat(accommodation.price_per_night.toString())
+        }
+      } else {
+        grouped[date] += 1
+      }
+    })
+    
+    // Convert to array and sort by date
+    return Object.entries(grouped)
+      .map(([date, value]) => ({
+        date,
+        [type]: value
+      } as ChartData))
+      .sort((a, b) => a.date.localeCompare(b.date))
+  }, [])
+
   const fetchData = useCallback(async () => {
     try {
       setLoading(true)
@@ -202,53 +248,7 @@ export default function AnalyticsDashboard() {
     } finally {
       setLoading(false)
     }
-  }, [getDateRange])
-
-  // Helper function to calculate trend
-  const calculateTrend = useCallback((data: { created_at: string }[]) => {
-    if (data.length === 0) return '+0%'
-    
-    // Simplified trend calculation - compare first and second half
-    const midpoint = Math.floor(data.length / 2)
-    const firstHalf = data.slice(0, midpoint).length
-    const secondHalf = data.slice(midpoint).length
-    
-    if (firstHalf === 0) return '+0%'
-    
-    const percentage = Math.round(((secondHalf - firstHalf) / firstHalf) * 100)
-    return `${percentage >= 0 ? '+' : ''}${percentage}%`
-  }, [])
-
-  // Helper function to generate chart data
-  const generateChartData = useCallback((data: { created_at: string; accommodation_id?: string }[], type: string, accommodations?: { id: string; price_per_night: number }[]) => {
-    // Group data by date
-    const grouped: Record<string, number> = {}
-    
-    data.forEach(item => {
-      const date = new Date(item.created_at).toISOString().split('T')[0]
-      if (!grouped[date]) {
-        grouped[date] = 0
-      }
-      
-      if (type === 'amount' && accommodations) {
-        // Find accommodation price for this booking
-        const accommodation = accommodations.find(acc => acc.id === item.accommodation_id)
-        if (accommodation) {
-          grouped[date] += parseFloat(accommodation.price_per_night.toString())
-        }
-      } else {
-        grouped[date] += 1
-      }
-    })
-    
-    // Convert to array and sort by date
-    return Object.entries(grouped)
-      .map(([date, value]) => ({
-        date,
-        [type]: value
-      } as ChartData))
-      .sort((a, b) => a.date.localeCompare(b.date))
-  }, [])
+  }, [getDateRange, calculateTrend, generateChartData])
 
   const handleDateRangeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setDateRange(e.target.value as '7d' | '30d' | '90d' | '1y')
