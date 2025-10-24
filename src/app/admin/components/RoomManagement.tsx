@@ -7,7 +7,7 @@ import { AccommodationRoom } from '../../../lib/supabaseHelpers'
 import { supabaseAdmin } from '../../../lib/supabaseClient'
 import Modal from '../../components/shared/Modal'
 import ImageUpload from '../../components/shared/ImageUpload'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import AlertDialog from '../../components/ui/AlertDialog'
 import Image from 'next/image'
 
@@ -36,8 +36,10 @@ interface RoomFormData {
 const getUid = (maybeId?: string, fallbackSeed?: string) => {
   if (maybeId && typeof maybeId === 'string' && maybeId.trim() !== '') return maybeId.trim()
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return `temp-${crypto.randomUUID()}`
-  // fallback
-  return `temp-${(fallbackSeed || '')}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+  // fallback - ensure unique ID with timestamp and random component
+  const timestamp = Date.now()
+  const random = Math.random().toString(36).slice(2, 11)
+  return `temp-${fallbackSeed || 'room'}-${timestamp}-${random}`
 }
 
 export default function RoomManagement({ accommodationId, accommodationTitle, onClose }: RoomManagementProps) {
@@ -214,9 +216,8 @@ export default function RoomManagement({ accommodationId, accommodationTitle, on
   }
 
   return (
-    <AnimatePresence>
+    <>
       <motion.div
-        key="room-management"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -272,7 +273,7 @@ export default function RoomManagement({ accommodationId, accommodationTitle, on
                   return (
                     <div key={key} className="bg-white border rounded-lg shadow-sm overflow-hidden">
                       <div className="aspect-video bg-gray-100 relative">
-                        {room.image_gallery && room.image_gallery.length > 0 ? (
+                        {room.image_gallery && room.image_gallery.length > 0 && room.image_gallery[0] && room.image_gallery[0].trim() !== '' ? (
                           <div className="relative w-full h-full">
                             <Image
                               src={room.image_gallery[0]}
@@ -483,6 +484,6 @@ export default function RoomManagement({ accommodationId, accommodationTitle, on
         cancelText="Cancel"
         variant="destructive"
       />
-    </AnimatePresence>
+    </>
   )
 }
