@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Accommodation, User } from '../../../lib/supabaseHelpers'
+import { Accommodation } from '../../../lib/supabaseHelpers'
 import ImageUpload from '../../components/shared/ImageUpload'
 import RoomManagement from './RoomManagement'
 import { Plus } from 'lucide-react'
