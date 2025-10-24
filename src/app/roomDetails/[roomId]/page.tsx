@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -604,4 +604,17 @@ const RoomDetailsComponent = () => {
   );
 };
 
-export default RoomDetailsComponent;
+export default function RoomDetailsPageWrapper() {
+  return (
+    <Suspense fallback={
+      <div className="mt-20 pb-16 w-full max-w-7xl mx-auto bg-white">
+        <div className="text-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading room details...</p>
+        </div>
+      </div>
+    }>
+      <RoomDetailsComponent />
+    </Suspense>
+  );
+}
