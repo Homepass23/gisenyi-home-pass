@@ -2,14 +2,13 @@ import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '../../../../../../lib/supabaseClient'
 
 
-
 // Hosts can update status of bookings that belong to their accommodations
 export async function PATCH(
   request: Request,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const bookingId = context.params.id
+    const { id: bookingId } = await context.params
     const body = await request.json()
     const { status } = body as { status?: 'confirmed' | 'rejected' | 'cancelled' }
 
