@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
@@ -12,7 +12,7 @@ import { fetchAccommodationById, fetchAccommodationRoomById, QueryAccommodation 
 import { getFirstValidImage } from '../../lib/imageHelpers'
 import Image from 'next/image'
 
-export default function BookingPage() {
+function BookingPageContent() {
   const { user } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -590,5 +590,20 @@ export default function BookingPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function BookingPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white mt-22 py-12 px-4 sm:px-6 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading booking details...</p>
+        </div>
+      </div>
+    }>
+      <BookingPageContent />
+    </Suspense>
   )
 }
