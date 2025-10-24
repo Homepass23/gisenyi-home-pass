@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Star, Bed } from 'lucide-react';
 import { FaBath, FaBed } from 'react-icons/fa';
@@ -661,4 +661,17 @@ const RoomDetailsComponent = () => {
   );
 };
 
-export default RoomDetailsComponent;
+export default function RoomDetailsPage() {
+  return (
+    <Suspense fallback={
+      <div className="max-w-7xl mx-auto p-6 bg-white">
+        <div className="text-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading room details...</p>
+        </div>
+      </div>
+    }>
+      <RoomDetailsComponent />
+    </Suspense>
+  );
+}
